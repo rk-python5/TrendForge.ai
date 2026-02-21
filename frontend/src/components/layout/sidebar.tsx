@@ -7,6 +7,7 @@ import {
     Sparkles,
     FileText,
     TrendingUp,
+    Calendar,
     Settings,
     Zap,
 } from "lucide-react";
@@ -15,7 +16,8 @@ const NAV = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/generate", label: "Generate", icon: Sparkles },
     { href: "/posts", label: "Posts", icon: FileText },
-    { href: "/trends", label: "Trends", icon: TrendingUp, badge: "Soon" },
+    { href: "/trends", label: "Trends", icon: TrendingUp },
+    { href: "/calendar", label: "Calendar", icon: Calendar },
     { href: "/settings", label: "Settings", icon: Settings, badge: "Soon" },
 ];
 

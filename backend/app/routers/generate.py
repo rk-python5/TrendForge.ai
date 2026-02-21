@@ -119,3 +119,23 @@ async def improve_post(body: ImproveRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class GenerateImageRequest(BaseModel):
+    post_id: int
+
+
+@router.post("/generate/image")
+async def generate_image(body: GenerateImageRequest):
+    """Generate an AI image for a post."""
+    from app.services.image_service import image_service
+
+    try:
+        result = await image_service.generate_for_post(body.post_id)
+        if result.get("error"):
+            raise HTTPException(status_code=400, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

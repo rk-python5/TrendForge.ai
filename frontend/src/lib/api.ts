@@ -64,6 +64,31 @@ export interface ReviewResult {
     content: string;
 }
 
+export interface Trend {
+    id: number;
+    title: string;
+    source: string;
+    source_url: string | null;
+    summary: string | null;
+    relevance_score: number | null;
+    engagement_count: number;
+    category: string | null;
+    discovered_at: string;
+    used: boolean;
+    metadata: Record<string, unknown>;
+}
+
+export interface QueueItem {
+    id: number;
+    post_id: number;
+    scheduled_for: string;
+    platform: string;
+    status: string;
+    error_message: string | null;
+    published_at: string | null;
+    posts?: Post;
+}
+
 /* ── Posts ── */
 
 export const api = {
@@ -105,6 +130,63 @@ export const api = {
             method: "POST",
             body: JSON.stringify({ post_id: postId, feedback }),
         }),
+
+    // Image Generation (Phase 3)
+    generateImage: (postId: number) =>
+        request<{ image_url: string | null; prompt: string; post_id: number }>("/api/generate/image", {
+            method: "POST",
+            body: JSON.stringify({ post_id: postId }),
+        }),
+
+    // Trends (Phase 2)
+    listTrends: (params?: { source?: string; category?: string; limit?: number; offset?: number }) => {
+        const q = new URLSearchParams();
+        if (params?.source) q.set("source", params.source);
+        if (params?.category) q.set("category", params.category);
+        if (params?.limit) q.set("limit", String(params.limit));
+        if (params?.offset) q.set("offset", String(params.offset));
+        const qs = q.toString();
+        return request<{ trends: Trend[]; count: number }>(`/api/trends/latest${qs ? `?${qs}` : ""}`);
+    },
+
+    getTrend: (id: number) => request<Trend>(`/api/trends/${id}`),
+
+    fetchTrends: () =>
+        request<{ fetched: number; message: string }>("/api/trends/fetch", { method: "POST" }),
+
+    generateFromTrend: (data: { trend_id: number; post_type?: string; tone?: string }) =>
+        request<GenerateResult>("/api/generate/from-trend", { method: "POST", body: JSON.stringify(data) }),
+
+    // Publishing (Phase 4)
+    schedulePost: (data: { post_id: number; scheduled_for: string; platform?: string }) =>
+        request<QueueItem>("/api/publish/schedule", { method: "POST", body: JSON.stringify(data) }),
+
+    publishNow: (postId: number) =>
+        request<{ message: string; post_id: number }>("/api/publish/now", {
+            method: "POST",
+            body: JSON.stringify({ post_id: postId }),
+        }),
+
+    getQueue: (params?: { status?: string; limit?: number }) => {
+        const q = new URLSearchParams();
+        if (params?.status) q.set("status", params.status);
+        if (params?.limit) q.set("limit", String(params.limit));
+        const qs = q.toString();
+        return request<{ queue: QueueItem[]; count: number }>(`/api/publish/queue${qs ? `?${qs}` : ""}`);
+    },
+
+    cancelSchedule: (queueId: number) =>
+        request<{ message: string }>(`/api/publish/schedule/${queueId}`, { method: "DELETE" }),
+
+    getCalendar: (month?: number, year?: number) => {
+        const q = new URLSearchParams();
+        if (month) q.set("month", String(month));
+        if (year) q.set("year", String(year));
+        const qs = q.toString();
+        return request<{ month: number; year: number; scheduled: QueueItem[]; published: Post[] }>(
+            `/api/publish/calendar${qs ? `?${qs}` : ""}`
+        );
+    },
 
     // Health
     health: () => request<{ status: string; service: string }>("/api/health"),
