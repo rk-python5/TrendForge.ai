@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.redis_client import init_redis, close_redis
-from app.routers import posts, generate, trends, publish
+from app.routers import posts, generate, trends, publish, analytics
 
 
 @asynccontextmanager
@@ -53,6 +53,7 @@ app.include_router(posts.router, prefix="/api", tags=["Posts"])
 app.include_router(generate.router, prefix="/api", tags=["Generation"])
 app.include_router(trends.router, prefix="/api", tags=["Trends"])
 app.include_router(publish.router, prefix="/api", tags=["Publishing"])
+app.include_router(analytics.router, prefix="/api", tags=["Analytics"])
 
 
 @app.get("/api/health")
