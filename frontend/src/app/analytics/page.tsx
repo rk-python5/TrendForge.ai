@@ -33,7 +33,7 @@ export default function AnalyticsPage() {
     const { data, isLoading } = useQuery({
         queryKey: ["analytics"],
         queryFn: () =>
-            fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/analytics`)
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/analytics`)
                 .then((r) => r.json()),
     });
 

@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     tone: str = "professional"
 
     # Frontend
-    frontend_url: str = "http://localhost:3000"
+    frontend_url: str = "http://localhost:3001"
 
     # API Keys (future phases)
     linkedin_client_id: Optional[str] = None
